@@ -35,6 +35,8 @@
     </style>
 </head>
 <body onload="initializeApp()">
+    <br>
+    <br>
     <div class="container">
         <input type="number" id="hexagramNumberInput" placeholder="Enter Hexagram Number" oninput="displayEnteredHexagram()">
     </div>
@@ -87,15 +89,13 @@
                 const reversedBinary = hexagramKey.split('').reverse().join('');
                 hexagramInfo.innerHTML = `
                     <div style="text-align:center;">
-                        <h4 style="margin: 0;">Hexagram: ${hexagram.hexagram}</h4>
-                        <p style="font-size: 24px;"> #${hexagram.number}</p>
+                        <h1 style="margin: 0;">#${hexagram.number} ${hexagram.hexagram}</h1>
                         <p> ${reversedBinary} / ${sumOfBinary}</p>
                     </div>
                     <div style="text-align:center;">
-                        <p> ${hexagram.name.chinese} (${hexagram.name.pinyin})</p>
+                        <h3> ${hexagram.name.chinese} (${hexagram.name.pinyin}) ${hexagram.name.english}</h3>
                     </div>
-                    <div style="text-align:center;">
-                        <p>${hexagram.name.english}</p>
+                    <div style="text-align:screenLeft;">
                         <p>Explanation: ${hexagram.judgement}</p>
                     </div>
                 `;
