@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I Ching App</title>
+    <style>
+        .container {
+            text-align: center;
+        }
+
+        .hexagram {
+            width: 200px;
+            margin: 20px auto;
+            text-align: center;
+        }
+        .line {
+            width: 200px;
+            height: 20px;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+        .yang {
+            background-color: black;
+        }
+        .yin {
+            background-image: linear-gradient(
+                to right,
+                black 45%,
+                white 45%,
+                white 55%,
+                black 55%
+            );
+        }
+    </style>
+</head>
+<body onload="initializeApp()">
+    <div class="container">
+        <input type="number" id="hexagramNumberInput" placeholder="Enter Hexagram Number" oninput="displayEnteredHexagram()">
+    </div>
+    
+    <div class="hexagram">
+        <div class="line yang" onclick="toggleLine(1)"></div>
+        <div class="line yang" onclick="toggleLine(2)"></div>
+        <div class="line yang" onclick="toggleLine(3)"></div>
+        <div class="line yang" onclick="toggleLine(4)"></div>
+        <div class="line yang" onclick="toggleLine(5)"></div>
+        <div class="line yang" onclick="toggleLine(6)"></div>
+    </div>
+
+    <div id="hexagramInfo" style="text-align: center; margin-top: 20px"></div>
+
+    <script>
+        async function fetchHexagrams() {
+            const response = await fetch('hexagrams.json');
+            const data = await response.json();
+            return data;
+        }
+
+        let timeoutId;
+
+        async function toggleLine(lineNumber) {
+            const line = document.querySelectorAll('.line')[lineNumber - 1];
+            line.classList.toggle('yang');
+            line.classList.toggle('yin');
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(calculateChangedHexagram, 300); // Wait for 300ms before calculating the changed hexagram
+        }
+
+        async function calculateChangedHexagram() {
+            const lines = document.querySelectorAll('.line');
+            let hexagramKey = '';
+            let sumOfBinary = 0;
+            // Start from the bottom line to adhere to the bottom-to-top reading order
+            for (let i = 0; i < lines.length; i++) {
+                hexagramKey += lines[i].classList.contains('yang') ? '1' : '0';
+                sumOfBinary += lines[i].classList.contains('yang') ? 1 : 0;
+            }
+            const hexagrams = await fetchHexagrams();
+            displayHexagramInfo(hexagrams, hexagramKey, sumOfBinary);
+        }
+
+        function displayHexagramInfo(hexagrams, hexagramKey, sumOfBinary) {
+            const hexagram = hexagrams[hexagramKey];
+            const hexagramInfo = document.getElementById('hexagramInfo');
+            if (hexagram) {
+                const reversedBinary = hexagramKey.split('').reverse().join('');
+                hexagramInfo.innerHTML = `
+                    <div style="text-align:center;">
+                        <h4 style="margin: 0;">Hexagram: ${hexagram.hexagram}</h4>
+                        <p style="font-size: 24px;"> #${hexagram.number}</p>
+                        <p> ${reversedBinary} / ${sumOfBinary}</p>
+                    </div>
+                    <div style="text-align:center;">
+                        <p> ${hexagram.name.chinese} (${hexagram.name.pinyin})</p>
+                    </div>
+                    <div style="text-align:center;">
+                        <p>${hexagram.name.english}</p>
+                        <p>Explanation: ${hexagram.judgement}</p>
+                    </div>
+                `;
+            } else {
+                hexagramInfo.innerHTML = "<p>Unknown Hexagram</p>";
+            }
+        }
+
+        async function displayEnteredHexagram() {
+            const hexagrams = await fetchHexagrams();
+            const inputElement = document.getElementById('hexagramNumberInput');
+            const enteredNumber = parseInt(inputElement.value);
+            if (enteredNumber >= 1 && enteredNumber <= 64) {
+                const hexagramKey = Object.keys(hexagrams).find(key => hexagrams[key].number === enteredNumber);
+                if (hexagramKey) {                
+                    displayHexagramInfo(hexagrams, hexagramKey);
+                }
+            } else {
+                document.getElementById('hexagramInfo').innerHTML = "<p>Invalid Hexagram Number</p>";
+            }
+        }
+
+        async function initializeApp() {
+            const hexagrams = await fetchHexagrams();
+            const hexagramKey = Object.keys(hexagrams).find(key => hexagrams[key].number === 1);
+            if (hexagramKey) {                
+                displayHexagramInfo(hexagrams, hexagramKey);
+            }
+        }
+    </script>
+</body>
+</html>
