@@ -81,8 +81,8 @@
         const lines = document.querySelectorAll('.line');
         let hexagramKey = '';
         let sumOfBinary = 0;
-        // Start from the bottom line to adhere to the bottom-to-top reading order
-        for (let i = 0; i < lines.length; i++) {
+        // Start from the top line to adhere to the top-to-bottom reading order
+        for (let i = lines.length - 1; i >= 0; i--) {
             hexagramKey = (lines[i].classList.contains('yang') ? '1' : '0') + hexagramKey;
             sumOfBinary += lines[i].classList.contains('yang') ? 1 : 0;
         }
@@ -158,6 +158,8 @@
         }
     }
 </script>
+
+
 
 
 </body>
